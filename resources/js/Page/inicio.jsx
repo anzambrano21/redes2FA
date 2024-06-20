@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useState, useEffect,useContext } from "react";
 import { useLocation, Link } from 'react-router-dom';
 import '../../css/app.css'
 import axios from 'axios';
@@ -122,29 +122,27 @@ export const Navega = () => {
 }
 export const Registro = () => {
     const example = useContext(Exaplecontect)
-
+    console.log(example);
+    
     const guardar = async () => {
         let user = document.getElementById("registerUsername").value;
         let emai = document.getElementById("registerEmail").value;
         let pasw1 = document.getElementById("registerPassword").value
         let pasw2 = document.getElementById("registerRepeatPassword").value
         let pswd
+        let guar={}
         if (pasw1 === pasw2) {
             pswd = pasw1;
         }
-        let guar = {
-            nom: user,
-            email: emai,
-            password: pswd
-        }
+        guar["nom"]=user
+        guar["email"]=emai
+        guar["password"]=pswd
+
 
         const response = await axios.post('http://127.0.0.1:8000/api/usuario', guar);
         let res= await axios.get("http://127.0.0.1:8000/seguridad")
-
+        example.setDatos(guar)
         window.location.href = "http://127.0.0.1:8000/registro/comprovar";
-
-        console.log(res.data);
-
 
 
 
@@ -208,13 +206,26 @@ export const Registro = () => {
         </div>
         )
     }
+    const veri= async ()=>{
+        console.log(example.datos);
+        let ver=document.getElementById('verifi').value
+        let guar={
+            email:example.datos.email,
+            password: example.datos.password,
+            veri: ver
+        }
+        console.log(guar);
+        let response= await axios.post('http://127.0.0.1:8000/api/log',guar)
+        console.log(response);
+    }
     const Compro=()=>{
         return(
             <div data-mdb-input-init className="form-outline mb-4 container1">
-            <button data-mdb-button-init data-mdb-ripple-init className="btn btn-primary btn-block mb-4">enviar comporovante</button>
-           
-                <input type="password" id="loginPassword" className="form-control" />
                 <label className="form-label" htmlFor="loginPassword">verificador</label>
+                <input type="password" id="verifi" className="form-control" />
+                <button data-mdb-button-init data-mdb-ripple-init className="btn btn-primary btn-block mb-4" onClick={veri}>enviar comporovante</button>
+           
+                
             </div>
         )
     }

@@ -42,6 +42,7 @@ class UsuarioController extends Controller
     public function log(Request $request)
     {
         $user = Usuario::where('correo', $request['email'])->first();
+        
         if ($user && Hash::check($request['password'], $user->contraseña) && $user["verificador"]==$request["veri"]) {
 
             return "existe";
