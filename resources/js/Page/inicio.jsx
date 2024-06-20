@@ -18,24 +18,33 @@ export const Inicio = () => {
             email: user,
             password: pasw
         }
-        const response = await axios.post('http://127.0.0.1:8000/api/log', usur);
-        console.log(response);
-        example.setDatos(response.data)
+        example.setDatos(usur);
+        const response = await axios.put(`http://127.0.0.1:8000/api/usuario/${user}`, usur);        
+        let res= await axios.get("http://127.0.0.1:8000/seguridad")
+        example.setDatos(usur)
+        window.location.href = "http://127.0.0.1:8000/inicio/comprovar";
 
-        if (response.data.home === 'Login successful') {
-            // Redirige al usuario a la página deseada
-            window.location.href = '/admin';
-        } else {
-            alert("inicio de secion fallida");
-        }
+
     }
+    const veri= async ()=>{
+        console.log(example.datos);
+        let ver=document.getElementById('verifi').value
+        let guar={
+            email:example.datos.email,
+            password: example.datos.password,
+            veri: ver
+        }
+        console.log(guar);
+        let response= await axios.post('http://127.0.0.1:8000/api/log',guar)
+        console.log(response);
+    }
+    
     const Compro=()=>{
         return(
             <div data-mdb-input-init className="form-outline mb-4 container1">
-            <button data-mdb-button-init data-mdb-ripple-init className="btn btn-primary btn-block mb-4">enviar comporovante</button>
-           
-                <input type="password" id="loginPassword" className="form-control" />
                 <label className="form-label" htmlFor="loginPassword">verificador</label>
+                <input type="password" id="verifi" className="form-control" />
+                <button data-mdb-button-init data-mdb-ripple-init className="btn btn-primary btn-block mb-4" onClick={veri}>enviar comporovante</button>                
             </div>
         )
     }

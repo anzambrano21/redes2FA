@@ -54,9 +54,12 @@ class UsuarioController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, usuario $usuario)
+    public function update(Request $request,  $usuario)
     {
-        //
+        $user=Usuario::where('correo', $usuario)->first();
+        $user["verificador"]=mt_rand(1000, 9999);
+        $user->save();
+
     }
 
     /**
