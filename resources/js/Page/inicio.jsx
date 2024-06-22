@@ -1,11 +1,12 @@
-import React, { useState, useEffect,useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useLocation, Link } from 'react-router-dom';
 import '../../css/app.css'
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.css';
 import { Exaplecontect } from "../context/contexto"
 import { Routes, Route } from 'react-router-dom';
-
+import { z } from 'zod'
+import { useFormik } from 'formik'
 export const Inicio = () => {
 
     const example = useContext(Exaplecontect)
@@ -19,32 +20,32 @@ export const Inicio = () => {
             password: pasw
         }
         example.setDatos(usur);
-        const response = await axios.put(`http://127.0.0.1:8000/api/usuario/${user}`, usur);        
-        let res= await axios.get("http://127.0.0.1:8000/seguridad")
-        example.setDatos(usur)
-        window.location.href = "http://127.0.0.1:8000/inicio/comprovar";
+        const response = await axios.put(`http://127.0.0.1:8000/api/usuario/${user}`, usur);
+        //let res = await axios.get("http://127.0.0.1:8000/seguridad")
+        console.log(response.data)
+        //window.location.href = "http://127.0.0.1:8000/inicio/comprovar";
 
 
     }
-    const veri= async ()=>{
+    const veri = async () => {
         console.log(example.datos);
-        let ver=document.getElementById('verifi').value
-        let guar={
-            email:example.datos.email,
+        let ver = document.getElementById('verifi').value
+        let guar = {
+            email: example.datos.email,
             password: example.datos.password,
             veri: ver
         }
         console.log(guar);
-        let response= await axios.post('http://127.0.0.1:8000/api/log',guar)
+        let response = await axios.post('http://127.0.0.1:8000/api/log', guar)
         console.log(response);
     }
-    
-    const Compro=()=>{
-        return(
+
+    const Compro = () => {
+        return (
             <div data-mdb-input-init className="form-outline mb-4 container1">
                 <label className="form-label" htmlFor="loginPassword">verificador</label>
                 <input type="password" id="verifi" className="form-control" />
-                <button data-mdb-button-init data-mdb-ripple-init className="btn btn-primary btn-block mb-4" onClick={veri}>enviar comporovante</button>                
+                <button data-mdb-button-init data-mdb-ripple-init className="btn btn-primary btn-block mb-4" onClick={veri}>enviar comporovante</button>
             </div>
         )
     }
@@ -85,13 +86,16 @@ export const Inicio = () => {
     return (
         <Routes>
             <Route path='/' element={<Defaul />} />
-            <Route path='/comprovar' element={<Compro  />} />
+            <Route path='/comprovar' element={<Compro />} />
         </Routes>
 
 
     );
 }
-
+const subscriberSchema = z.object({
+    name: z.string().min(5, { message: "Ingrese un nombre que tenga 5 caracteres" }),
+    email: z.string().email({ message: "Ingrese un correo valido " }),
+})
 export const Navega = () => {
     const location = useLocation();
 
@@ -130,36 +134,54 @@ export const Navega = () => {
 
 }
 export const Registro = () => {
+    const formik = useFormik({
+        inicialValue: {
+            name: "",
+            email: "",
+            
+        },
+        onSubmit: (values) => {
+            const result = subscriberSchema.safeParse(values);
+            if (result.success) return;
+            console.log(result.error);
+        }
+    })
     const example = useContext(Exaplecontect)
     console.log(example);
-    
+
     const guardar = async () => {
         let user = document.getElementById("registerUsername").value;
         let emai = document.getElementById("registerEmail").value;
         let pasw1 = document.getElementById("registerPassword").value
         let pasw2 = document.getElementById("registerRepeatPassword").value
         let pswd
-        let guar={}
-        let error=false
+        let guar = {}
+        let error = false
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         if (pasw1 === pasw2) {
             pswd = pasw1;
-            if (!passwordRegex.test(pswd)){
-                error=true
-                alert("deve de cumplir con los requisitos")
-            }else{
+            if (!passwordRegex.test(pswd)) {
+                error = true
+                alert("La contraceña deve de tener por lomenos A a 9 @")
+            } else {
                 console.log("gol");
-                
+
             }
-        }else{
-            error=true
+        } else {
+            error = true
         }
-        guar["nom"]=user
-        guar["email"]=emai
-        guar["password"]=pswd
+        if (!emailRegex.test(emai)){
+            error=true
+            alert("El campo de correo tiene que ser valido ")
+        }
+        guar["nom"] = user
+        guar["email"] = emai
+        guar["password"] = pswd
         if (!error) {
             const response = await axios.post('http://127.0.0.1:8000/api/usuario', guar);
-            let res= await axios.get("http://127.0.0.1:8000/seguridad")
+            let res = await axios.get("http://127.0.0.1:8000/seguridad")
             example.setDatos(guar)
             //window.location.href = "http://127.0.0.1:8000/registro/comprovar";  
         }
@@ -167,95 +189,99 @@ export const Registro = () => {
 
 
     }
-    const Defaul=()=>{
-        return(
+    const Defaul = () => {  
+        return (
             <div className="container1">
-            <Navega />
-            <div className="tab-content">
-                <div className="tab-pane fade show active" id="pills-register" role="tabpanel" aria-labelledby="tab-register">
-                    <form>
-                        <div className="text-center mb-3">
-                            <p></p>
-                            <button type="button" data-mdb-button-init data-mdb-ripple-init className="btn btn-link btn-floating mx-1">
-                                <i className="fab fa-facebook-f"></i>
-                            </button>
+                <Navega />
+                <div className="tab-content">
+                    <div className="tab-pane fade show active" id="pills-register" role="tabpanel" aria-labelledby="tab-register">
+                        <form >
+                            <div className="text-center mb-3">
+                                <p></p>
+                                <button type="button" data-mdb-button-init data-mdb-ripple-init className="btn btn-link btn-floating mx-1">
+                                    <i className="fab fa-facebook-f"></i>
+                                </button>
 
-                            <button type="button" data-mdb-button-init data-mdb-ripple-init className="btn btn-link btn-floating mx-1">
-                                <i className="fab fa-google"></i>
-                            </button>
+                                <button type="button" data-mdb-button-init data-mdb-ripple-init className="btn btn-link btn-floating mx-1">
+                                    <i className="fab fa-google"></i>
+                                </button>
 
-                            <button type="button" data-mdb-button-init data-mdb-ripple-init className="btn btn-link btn-floating mx-1">
-                                <i className="fab fa-twitter"></i>
-                            </button>
+                                <button type="button" data-mdb-button-init data-mdb-ripple-init className="btn btn-link btn-floating mx-1">
+                                    <i className="fab fa-twitter"></i>
+                                </button>
 
-                            <button type="button" data-mdb-button-init data-mdb-ripple-init className="btn btn-link btn-floating mx-1">
-                                <i className="fab fa-github"></i>
-                            </button>
-                        </div>
-                        <div data-mdb-input-init className="form-outline mb-4">
-                            <input type="text" id="registerUsername" className="form-control" />
-                            <label className="form-label" htmlFor="registerUsername">Nombre de Usuario</label>
-                        </div>
-
-
-                        <div data-mdb-input-init className="form-outline mb-4">
-                            <input type="email" id="registerEmail" className="form-control" />
-                            <label className="form-label" htmlFor="registerEmail">Correo </label>
-                        </div>
+                                <button type="button" data-mdb-button-init data-mdb-ripple-init className="btn btn-link btn-floating mx-1">
+                                    <i className="fab fa-github"></i>
+                                </button>
+                            </div>
+                            <div data-mdb-input-init className="form-outline mb-4">
+                                <input type="text" id="registerUsername"  maxLength={5} required  className="form-control" />
+                                <label className="form-label" htmlFor="registerUsername">Nombre de Usuario</label>
+                                
+                            </div>
 
 
-                        <div data-mdb-input-init className="form-outline mb-4">
-                            <input type="password" id="registerPassword" className="form-control" />
-                            <label className="form-label" htmlFor="registerPassword">Contraseña</label>
-                        </div>
+                            <div data-mdb-input-init className="form-outline mb-4">
+                                <input type="email" id="registerEmail" required className="form-control" />
+                                <label className="form-label" htmlFor="registerEmail">Correo </label>
+                                
+                            </div>
 
 
-                        <div data-mdb-input-init className="form-outline mb-4">
-                            <input type="password" id="registerRepeatPassword" className="form-control" />
-                            <label className="form-label" htmlFor="registerRepeatPassword">Repite Contraseña</label>
-                        </div>
+                            <div data-mdb-input-init className="form-outline mb-4">
+                                <input type="password" id="registerPassword" required  className="form-control" />
+                                <label className="form-label" htmlFor="registerPassword">Contraseña</label>
+                                
+                            </div>
+
+
+                            <div data-mdb-input-init className="form-outline mb-4">
+                                <input type="password" id="registerRepeatPassword" required className="form-control" />
+                                <label className="form-label" htmlFor="registerRepeatPassword">Repite Contraseña</label>
+                                
+                            </div>
 
 
 
 
 
-                        <button type="button" onClick={guardar} data-mdb-button-init data-mdb-ripple-init className="btn btn-primary btn-block mb-3">Registrar</button>
-                    </form>
+                            <button type="submit" onClick={guardar} data-mdb-button-init data-mdb-ripple-init className="btn btn-primary btn-block mb-3">Registrar</button>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
         )
     }
-    const veri= async ()=>{
+    const veri = async () => {
         console.log(example.datos);
-        let ver=document.getElementById('verifi').value
-        let guar={
-            email:example.datos.email,
+        let ver = document.getElementById('verifi').value
+        let guar = {
+            email: example.datos.email,
             password: example.datos.password,
             veri: ver
         }
         console.log(guar);
-        let response= await axios.post('http://127.0.0.1:8000/api/log',guar)
+        let response = await axios.post('http://127.0.0.1:8000/api/log', guar)
         console.log(response);
     }
-    const Compro=()=>{
-        return(
+    const Compro = () => {
+        return (
             <div data-mdb-input-init className="form-outline mb-4 container1">
                 <label className="form-label" htmlFor="loginPassword">verificador</label>
                 <input type="password" id="verifi" className="form-control" />
                 <button data-mdb-button-init data-mdb-ripple-init className="btn btn-primary btn-block mb-4" onClick={veri}>enviar comporovante</button>
-           
-                
+
+
             </div>
         )
     }
     return (
 
-            <Routes>
-                <Route path='/' element={<Defaul  />} />
-                <Route path='/comprovar' element={<Compro  />} />
-            </Routes>
-    
+        <Routes>
+            <Route path='/' element={<Defaul />} />
+            <Route path='/comprovar' element={<Compro />} />
+        </Routes>
+
 
     );
 
