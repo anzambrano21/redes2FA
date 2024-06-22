@@ -2,6 +2,8 @@
 use App\Models\usuario;
 
 $user = usuario::latest('updated_at')->first();
+$correo=$user["correo"];
+$url = url("http://127.0.0.1:8000/api/Validar/$correo");
 ?>
 
 
@@ -14,7 +16,10 @@ $user = usuario::latest('updated_at')->first();
     <title>SEguridad</title>
 </head>
 <body>
-    <h1>Codigo de verificacion</h1>
-    <p><?php echo $user["verificador"] ?></p>
+    <h1>Enlacce de verificacion</h1>
+   
+    <a href=<?php echo $url?>>Validar</a>
+
+
 </body>
 </html>

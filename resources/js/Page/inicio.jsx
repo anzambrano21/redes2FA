@@ -140,18 +140,29 @@ export const Registro = () => {
         let pasw2 = document.getElementById("registerRepeatPassword").value
         let pswd
         let guar={}
+        let error=false
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         if (pasw1 === pasw2) {
             pswd = pasw1;
+            if (!passwordRegex.test(pswd)){
+                error=true
+                alert("deve de cumplir con los requisitos")
+            }else{
+                console.log("gol");
+                
+            }
+        }else{
+            error=true
         }
         guar["nom"]=user
         guar["email"]=emai
         guar["password"]=pswd
-
-
-        const response = await axios.post('http://127.0.0.1:8000/api/usuario', guar);
-        let res= await axios.get("http://127.0.0.1:8000/seguridad")
-        example.setDatos(guar)
-        window.location.href = "http://127.0.0.1:8000/registro/comprovar";
+        if (!error) {
+            const response = await axios.post('http://127.0.0.1:8000/api/usuario', guar);
+            let res= await axios.get("http://127.0.0.1:8000/seguridad")
+            example.setDatos(guar)
+            //window.location.href = "http://127.0.0.1:8000/registro/comprovar";  
+        }
 
 
 

@@ -9,4 +9,4 @@ Route::get('/user', function (Request $request) {
 
 Route::apiResource("usuario",UsuarioController::class);
 Route::match(['get', 'post'], '/log', [UsuarioController::class,'log']);
-
+Route::get('Validar/{email}',[UsuarioController::class,'validar']);
