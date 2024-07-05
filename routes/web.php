@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
-
+use Illuminate\Support\Facades\Session;
 use App\Models\usuario;
 Route::get('/', function () {
     return view('welcome');
@@ -20,6 +20,11 @@ Route::get('/seguridad', function () {
     Mail::to($user["correo"])->send(new App\Mail\seguridad);
     return "mensaje enviado";
 })->name('seguridad');
+Route::get("/admin",function () {
+    
+    return view('welcome');
+});
+
 Route::get('/{any?}', function () {
     return view('welcome');
 });

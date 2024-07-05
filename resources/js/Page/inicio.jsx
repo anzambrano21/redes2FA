@@ -5,8 +5,7 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.css';
 import { Exaplecontect } from "../context/contexto"
 import { Routes, Route } from 'react-router-dom';
-import { z } from 'zod'
-import { useFormik } from 'formik'
+
 export const Inicio = () => {
 
     const example = useContext(Exaplecontect)
@@ -20,10 +19,10 @@ export const Inicio = () => {
             password: pasw
         }
         example.setDatos(usur);
-        const response = await axios.put(`http://127.0.0.1:8000/api/usuario/${user}`, usur);
+        let response = await axios.post('http://127.0.0.1:8000/api/log', usur)
         //let res = await axios.get("http://127.0.0.1:8000/seguridad")
         console.log(response.data)
-        //window.location.href = "http://127.0.0.1:8000/inicio/comprovar";
+        
 
 
     }
@@ -56,8 +55,7 @@ export const Inicio = () => {
 
                 <div className="tab-content">
                     <div className="tab-pane fade show active" id="pills-login" role="tabpanel" aria-labelledby="tab-login">
-                        <form>
-
+                        
                             <div data-mdb-input-init className="form-outline mb-4">
                                 <input type="email" id="loginName" className="form-control" />
                                 <label className="form-label" htmlFor="loginName">Correo</label>
@@ -76,7 +74,7 @@ export const Inicio = () => {
                             <div className="text-center">
                                 <p>Estas Registrado <a href="http://127.0.0.1:8000/registro">Registrar</a></p>
                             </div>
-                        </form>
+                        
                     </div>
                 </div>
 
@@ -92,10 +90,7 @@ export const Inicio = () => {
 
     );
 }
-const subscriberSchema = z.object({
-    name: z.string().min(5, { message: "Ingrese un nombre que tenga 5 caracteres" }),
-    email: z.string().email({ message: "Ingrese un correo valido " }),
-})
+
 export const Navega = () => {
     const location = useLocation();
 
@@ -134,18 +129,7 @@ export const Navega = () => {
 
 }
 export const Registro = () => {
-    const formik = useFormik({
-        inicialValue: {
-            name: "",
-            email: "",
-            
-        },
-        onSubmit: (values) => {
-            const result = subscriberSchema.safeParse(values);
-            if (result.success) return;
-            console.log(result.error);
-        }
-    })
+
     const example = useContext(Exaplecontect)
     console.log(example);
 
@@ -176,13 +160,14 @@ export const Registro = () => {
             error=true
             alert("El campo de correo tiene que ser valido ")
         }
+        console.log(error);
         guar["nom"] = user
         guar["email"] = emai
         guar["password"] = pswd
         if (!error) {
             const response = await axios.post('http://127.0.0.1:8000/api/usuario', guar);
             let res = await axios.get("http://127.0.0.1:8000/seguridad")
-            example.setDatos(guar)
+            //example.setDatos(guar)
             //window.location.href = "http://127.0.0.1:8000/registro/comprovar";  
         }
 
@@ -245,7 +230,7 @@ export const Registro = () => {
 
 
 
-                            <button type="submit" onClick={guardar} data-mdb-button-init data-mdb-ripple-init className="btn btn-primary btn-block mb-3">Registrar</button>
+                            <button onClick={guardar} data-mdb-button-init data-mdb-ripple-init className="btn btn-primary btn-block mb-3">Registrar</button>
                         </form>
                     </div>
                 </div>

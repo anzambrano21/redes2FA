@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 
 class UsuarioController extends Controller
 {
@@ -13,7 +14,8 @@ class UsuarioController extends Controller
      */
     public function index()
     {
-        //
+        $wallet = usuario::all();
+        return response()->json($wallet);
     }
 
     /**
@@ -26,8 +28,9 @@ class UsuarioController extends Controller
         usuario::Create([
             "nombre"=>$request["nom"],
             "correo"=>$request["email"],
+            "rol"=>"visitante",
             "contraseña"=>bcrypt($request["password"]),
-            "verificador"=>mt_rand(1000, 9999)
+            "verificador"=>0
         ]);
         return "creado";
     }
@@ -42,10 +45,10 @@ class UsuarioController extends Controller
     public function log(Request $request)
     {
         $user = Usuario::where('correo', $request['email'])->first();
-        
-        if ($user && Hash::check($request['password'], $user->contraseña) && $user["verificador"]==$request["veri"]) {
+        session()->put(['rol'=>'visita']);
+        if ($user && Hash::check($request['password'], $user->contraseña) && $user["verificador"]==1) {
 
-            return "existe";
+            return redirect('http://127.0.0.1:8000/admin');
         } else {
             return "No existe";
         }

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->text("nombre");
             $table->text("correo");
             $table->text("contraseña");
+            $table->text("rol");
             $table->integer("verificador");
             $table->timestamps();
         });
